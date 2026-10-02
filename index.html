@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>محوّل الكونفيقات</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=JetBrains+Mono&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#faf7f9;color:#2e2233;font-family:'Readex Pro',Tahoma,sans-serif;padding-bottom:120px}
@@ -22,7 +23,6 @@ textarea:focus{border-color:#c44d76}
 .row{display:flex;gap:8px;margin-top:12px}
 button{font-family:inherit;cursor:pointer;border-radius:12px;font-weight:700}
 #go{flex:1;background:#c44d76;color:#fff;border:0;font-size:18px;padding:12px}
-#go:disabled{opacity:.4}
 #clear{background:none;border:2px solid #e9dfec;color:#59386c;padding:0 20px;font-size:16px}
 #res{margin-top:24px;display:none}
 .count{display:flex;align-items:baseline;gap:14px}
@@ -47,30 +47,32 @@ li{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #ee
 <main class="wrap">
 <div class="card">
 <label for="in">الصق الكونفيقات هنا (كل واحد في سطر)</label>
-<textarea id="in" placeholder="vless://...&#10;trojan://..."></textarea>
-<div class="row"><button id="go" disabled>حوّل</button><button id="clear">مسح</button></div>
+<textarea id="in" spellcheck="false" autocomplete="off"></textarea>
+<div class="row"><button id="go" type="button">حوّل</button><button id="clear" type="button">مسح</button></div>
 </div>
-<section id="res"><div class="count"><b id="ok">0</b><span>اتعدّل</span><span class="s" id="sk"></span></div><ul id="list"></ul></section>
+<div id="res">
+<div class="count"><b id="ok">0</b><span>اتعدّل</span><span class="s" id="sk"></span></div><ul id="list"></ul>
+</div>
 </main>
-<div id="bar"><button id="copy"></button></div>
+<div id="bar"><button id="copy" type="button">انسخ الكل</button></div>
 <script>
-const FP = "unsafe";
-const ALPN = "http%2F1.1";
-const CS = "TLS_AES_256_GCM_SHA384%3ATLS_CHACHA20_POLY1305_SHA256%3ATLS_AES_128_GCM_SHA256%3ATLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384%3ATLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384%3ATLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256%3ATLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256%3ATLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256%3ATLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256%3ATLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA%3ATLS_ECDHE_RSA_WITH_AES_256_CBC_SHA%3ATLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256%3ATLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256";
-const FM = "%7B%22tcp%22%3A%5B%7B%22type%22%3A%22fragment%22%2C%22settings%22%3A%7B%22packets%22%3A%22tlshello%22%2C%22lengths%22%3A%5B%220%22%2C%22104%22%2C%221%22%5D%2C%22delays%22%3A%5B%220%22%5D%2C%22maxSplit%22%3A%220%22%7D%7D%2C%7B%22type%22%3A%22fragment%22%2C%22settings%22%3A%7B%22packets%22%3A%221-1%22%2C%22lengths%22%3A%5B%22114%22%2C%221%22%5D%2C%22delays%22%3A%5B%221%22%5D%2C%22maxSplit%22%3A%2211%22%7D%7D%5D%7D";
+var NL = String.fromCharCode(10);
+var FP = "unsafe";
+var ALPN = "http%2F1.1";
+var CS = "TLS_AES_256_GCM_SHA384%3ATLS_CHACHA20_POLY1305_SHA256%3ATLS_AES_128_GCM_SHA256%3ATLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384%3ATLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384%3ATLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256%3ATLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256%3ATLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256%3ATLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256%3ATLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA%3ATLS_ECDHE_RSA_WITH_AES_256_CBC_SHA%3ATLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256%3ATLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256";
+var FM = "%7B%22tcp%22%3A%5B%7B%22type%22%3A%22fragment%22%2C%22settings%22%3A%7B%22packets%22%3A%22tlshello%22%2C%22lengths%22%3A%5B%220%22%2C%22104%22%2C%221%22%5D%2C%22delays%22%3A%5B%220%22%5D%2C%22maxSplit%22%3A%220%22%7D%7D%2C%7B%22type%22%3A%22fragment%22%2C%22settings%22%3A%7B%22packets%22%3A%221-1%22%2C%22lengths%22%3A%5B%22114%22%2C%221%22%5D%2C%22delays%22%3A%5B%221%22%5D%2C%22maxSplit%22%3A%2211%22%7D%7D%5D%7D";
 
 function clean(text) {
   return text
-    .replace(/\[([^\]
-]*)\]\(https?:\/\/[^)\s]*\)/g, "$1")
+    .replace(/\[([^\]\s]*)\]\(https?:\/\/[^)\s]*\)/g, "$1")
     .replace(/\\([_\[\]*~`])/g, "$1");
 }
 
 function setParam(query, key, value) {
-  const parts = query === "" ? [] : query.split("&");
-  let found = false;
-  const out = parts.map((p) => {
-    const k = p.split("=")[0];
+  var parts = query === "" ? [] : query.split("&");
+  var found = false;
+  var out = parts.map(function (p) {
+    var k = p.split("=")[0];
     if (k === key) { found = true; return key + "=" + value; }
     return p;
   });
@@ -79,17 +81,17 @@ function setParam(query, key, value) {
 }
 
 function convertLine(line) {
-  const l = line.trim();
-  if (!l.includes("://")) return null;
-  const scheme = l.split("://")[0].toLowerCase();
+  var l = line.trim();
+  if (l.indexOf("://") === -1) return null;
+  var scheme = l.split("://")[0].toLowerCase();
   if (scheme !== "vless" && scheme !== "trojan") return { out: l, status: "skip", why: scheme.toUpperCase() };
-  const h = l.indexOf("#");
-  const body = h === -1 ? l : l.slice(0, h);
-  const tag = h === -1 ? "" : l.slice(h);
-  const q = body.indexOf("?");
-  const head = q === -1 ? body : body.slice(0, q);
-  let query = q === -1 ? "" : body.slice(q + 1);
-  const sec = (query.match(/(?:^|&)security=([^&]*)/) || ["", ""])[1].toLowerCase();
+  var h = l.indexOf("#");
+  var body = h === -1 ? l : l.slice(0, h);
+  var tag = h === -1 ? "" : l.slice(h);
+  var q = body.indexOf("?");
+  var head = q === -1 ? body : body.slice(0, q);
+  var query = q === -1 ? "" : body.slice(q + 1);
+  var sec = (query.match(/(?:^|&)security=([^&]*)/) || ["", ""])[1].toLowerCase();
   if (sec !== "tls") return { out: l, status: "skip", why: sec === "reality" ? "Reality" : "بدون TLS" };
   query = setParam(query, "fp", FP);
   query = setParam(query, "alpn", ALPN);
@@ -99,39 +101,53 @@ function convertLine(line) {
 }
 
 function convertAll(text) {
-  let t = clean(text).trim();
-  if (t && !t.includes("://")) {
-    try { t = decodeURIComponent(escape(atob(t.replace(/\s+/g, "")))); } catch {}
+  var t = clean(text).trim();
+  if (t && t.indexOf("://") === -1) {
+    try { t = decodeURIComponent(escape(atob(t.replace(/\s+/g, "")))); } catch (e) {}
   }
-  return t.split(/\r?
-/).map(convertLine).filter(Boolean);
+  return t.split(NL).map(convertLine).filter(Boolean);
 }
 
 function nameOf(line) {
-  const h = line.indexOf("#");
+  var h = line.indexOf("#");
   if (h === -1) return line.slice(0, 40);
-  try { return decodeURIComponent(line.slice(h + 1)); } catch { return line.slice(h + 1); }
+  try { return decodeURIComponent(line.slice(h + 1)); } catch (e) { return line.slice(h + 1); }
 }
 
-var inp=document.getElementById('in'),go=document.getElementById('go'),res=document.getElementById('res'),bar=document.getElementById('bar'),cp=document.getElementById('copy'),output='',total=0;
-function reset(){res.style.display='none';bar.style.display='none';go.disabled=!inp.value.trim();}
-inp.addEventListener('input',reset);
-document.getElementById('clear').onclick=function(){inp.value='';reset();};
-go.onclick=function(){
- var r=convertAll(inp.value),ok=r.filter(function(x){return x.status==='ok'}).length;
- total=r.length;output=r.map(function(x){return x.out}).join('
-');
- document.getElementById('ok').textContent=ok;
- document.getElementById('sk').textContent=r.length-ok>0?('و '+(r.length-ok)+' تخطيته بدون تغيير'):'';
- var ul=document.getElementById('list');ul.innerHTML='';
- if(!r.length){ul.innerHTML='<li class="err">ما لقيت ولا كونفيق، تأكد من اللصق.</li>';}
- r.forEach(function(x){var li=document.createElement('li');var t=document.createElement('span');t.className='tag '+(x.status==='ok'?'ok':'sk');t.textContent=x.status==='ok'?'✓ اتضاف':'تخطيت · '+x.why;var n=document.createElement('span');n.className='nm';n.textContent=nameOf(x.out);li.appendChild(t);li.appendChild(n);ul.appendChild(li);});
- res.style.display='block';bar.style.display=r.length?'block':'none';cp.textContent='انسخ الكل ('+total+')';
+var inp = document.getElementById("in"), go = document.getElementById("go"), res = document.getElementById("res"), bar = document.getElementById("bar"), cp = document.getElementById("copy"), output = "", total = 0;
+
+function reset() { res.style.display = "none"; bar.style.display = "none"; }
+inp.addEventListener("input", reset);
+document.getElementById("clear").onclick = function () { inp.value = ""; reset(); };
+
+go.onclick = function () {
+  if (!inp.value.trim()) { inp.focus(); return; }
+  var r = convertAll(inp.value), ok = r.filter(function (x) { return x.status === "ok"; }).length;
+  total = r.length;
+  output = r.map(function (x) { return x.out; }).join(NL);
+  document.getElementById("ok").textContent = ok;
+  document.getElementById("sk").textContent = r.length - ok > 0 ? ("و " + (r.length - ok) + " تخطيته بدون تغيير") : "";
+  var ul = document.getElementById("list"); ul.innerHTML = "";
+  if (!r.length) { ul.innerHTML = '<li class="err">ما لقيت ولا كونفيق، تأكد من اللصق.</li>'; }
+  r.forEach(function (x) {
+    var li = document.createElement("li");
+    var t = document.createElement("span");
+    t.className = "tag " + (x.status === "ok" ? "ok" : "sk");
+    t.textContent = x.status === "ok" ? "✓ اتضاف" : "تخطيت · " + x.why;
+    var n = document.createElement("span");
+    n.className = "nm";
+    n.textContent = nameOf(x.out);
+    li.appendChild(t); li.appendChild(n); ul.appendChild(li);
+  });
+  res.style.display = "block";
+  bar.style.display = r.length ? "block" : "none";
+  cp.textContent = "انسخ الكل (" + total + ")";
 };
-cp.onclick=function(){
- function done(){cp.textContent='✓ انسخ، روح الصقه في v2rayNG';setTimeout(function(){cp.textContent='انسخ الكل ('+total+')'},1800);}
- function fb(){var t=document.createElement('textarea');t.value=output;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();done();}
- if(navigator.clipboard){navigator.clipboard.writeText(output).then(done,fb);}else fb();
+
+cp.onclick = function () {
+  function done() { cp.textContent = "✓ انسخ، روح الصقه في v2rayNG"; setTimeout(function () { cp.textContent = "انسخ الكل (" + total + ")"; }, 1800); }
+  function fb() { var t = document.createElement("textarea"); t.value = output; document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove(); done(); }
+  if (navigator.clipboard) { navigator.clipboard.writeText(output).then(done, fb); } else fb();
 };
 </script>
 </body>
