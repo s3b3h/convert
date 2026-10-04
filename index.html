@@ -47,7 +47,7 @@ li{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #ee
 <h1>محوّل الكونفيقات</h1>
 <p>اختار الطريقة، وهو يضيف الإعدادات وما يلمس شي ثاني.</p>
 <div class="chips"><b>Fragment P</b><span>fm</span><span>fp=unsafe</span><span>alpn=http/1.1</span><span>cs</span></div>
-<div class="chips"><b>ECH</b><span>fp=chrome</span><span>echConfigList</span></div>
+<div class="chips"><b>ECH</b><span>fp=chrome</span><span>ech</span></div>
 </div></header>
 <main class="wrap">
 <div class="card">
@@ -69,7 +69,7 @@ var ALPN = "http%2F1.1";
 var CS = "TLS_AES_256_GCM_SHA384%3ATLS_CHACHA20_POLY1305_SHA256%3ATLS_AES_128_GCM_SHA256%3ATLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384%3ATLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384%3ATLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256%3ATLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256%3ATLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256%3ATLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256%3ATLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA%3ATLS_ECDHE_RSA_WITH_AES_256_CBC_SHA%3ATLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256%3ATLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256";
 var FM = "%7B%22tcp%22%3A%5B%7B%22type%22%3A%22fragment%22%2C%22settings%22%3A%7B%22packets%22%3A%22tlshello%22%2C%22lengths%22%3A%5B%220%22%2C%22104%22%2C%221%22%5D%2C%22delays%22%3A%5B%220%22%5D%2C%22maxSplit%22%3A%220%22%7D%7D%2C%7B%22type%22%3A%22fragment%22%2C%22settings%22%3A%7B%22packets%22%3A%221-1%22%2C%22lengths%22%3A%5B%22114%22%2C%221%22%5D%2C%22delays%22%3A%5B%221%22%5D%2C%22maxSplit%22%3A%2211%22%7D%7D%5D%7D";
 
-// طريقة ECH
+// طريقة ECH (في الرابط اسمها ech، وفي البرنامج تطلع في خانة echConfigList)
 var ECH_FP = "chrome";
 var ECH = encodeURIComponent("cloudflare-ech.com+udp://1.1.1.1");
 
@@ -115,8 +115,10 @@ function convertLine(line, mode) {
     query = removeParam(query, "cs");
     query = removeParam(query, "fm");
     query = setParam(query, "fp", ECH_FP);
-    query = setParam(query, "echConfigList", ECH);
+    query = removeParam(query, "echConfigList");
+    query = setParam(query, "ech", ECH);
   } else {
+    query = removeParam(query, "ech");
     query = removeParam(query, "echConfigList");
     query = setParam(query, "fp", FP);
     query = setParam(query, "alpn", ALPN);
