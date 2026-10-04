@@ -13,8 +13,9 @@ header{background:#59386c;color:#fff;padding:40px 20px 48px}
 .wrap{max-width:672px;margin:0 auto}
 h1{font-size:40px;margin:0;line-height:1.2}
 header p{margin:12px 0 0;font-size:18px;color:#e7d9ee}
-.chips{margin-top:20px;display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;direction:ltr;font-family:'JetBrains Mono',monospace;font-size:14px}
+.chips{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;direction:ltr;font-family:'JetBrains Mono',monospace;font-size:14px}
 .chips span{background:rgba(255,255,255,.15);border-radius:99px;padding:4px 12px}
+.chips b{color:#fff;font-family:'Readex Pro',sans-serif}
 main{padding:0 20px;margin-top:-24px}
 .card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 8px 30px -12px rgba(89,56,108,.35)}
 label{display:block;font-weight:600;margin-bottom:8px}
@@ -22,12 +23,15 @@ textarea{width:100%;height:192px;border:2px solid #e9dfec;border-radius:12px;pad
 textarea:focus{border-color:#c44d76}
 .row{display:flex;gap:8px;margin-top:12px}
 button{font-family:inherit;cursor:pointer;border-radius:12px;font-weight:700}
-#go{flex:1;background:#c44d76;color:#fff;border:0;font-size:18px;padding:12px}
+.go{flex:1;color:#fff;border:0;font-size:18px;padding:12px}
+#goFrag{background:#c44d76}
+#goEch{background:#2f6f8f}
 #clear{background:none;border:2px solid #e9dfec;color:#59386c;padding:0 20px;font-size:16px}
 #res{margin-top:24px;display:none}
-.count{display:flex;align-items:baseline;gap:14px}
+.count{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
 .count b{font-size:48px;color:#447861}
 .count .s{color:#58455d}
+.mode{background:#efe8f1;color:#59386c;border-radius:99px;padding:4px 12px;font-weight:600;font-size:14px}
 ul{list-style:none;padding:0;margin:16px 0 0}
 li{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #eee5f0;border-radius:12px;padding:12px 16px;margin-bottom:8px}
 .tag{flex-shrink:0;border-radius:99px;font-size:14px;font-weight:600;padding:4px 12px}
@@ -41,26 +45,33 @@ li{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #ee
 <body>
 <header><div class="wrap">
 <h1>محوّل الكونفيقات</h1>
-<p>يضيف التكسير والبصمة وكل الإعدادات، وما يلمس شي ثاني.</p>
-<div class="chips"><span>fm (fragment)</span><span>fp=unsafe</span><span>alpn=http/1.1</span><span>cs (ciphers)</span></div>
+<p>اختار الطريقة، وهو يضيف الإعدادات وما يلمس شي ثاني.</p>
+<div class="chips"><b>Fragment P</b><span>fm</span><span>fp=unsafe</span><span>alpn=http/1.1</span><span>cs</span></div>
+<div class="chips"><b>ECH</b><span>fp=chrome</span><span>echConfigList</span></div>
 </div></header>
 <main class="wrap">
 <div class="card">
 <label for="in">الصق الكونفيقات هنا (كل واحد في سطر)</label>
 <textarea id="in" spellcheck="false" autocomplete="off"></textarea>
-<div class="row"><button id="go" type="button">حوّل</button><button id="clear" type="button">مسح</button></div>
+<div class="row"><button id="goFrag" class="go" type="button">Fragment P</button><button id="goEch" class="go" type="button">ECH</button><button id="clear" type="button">مسح</button></div>
 </div>
 <div id="res">
-<div class="count"><b id="ok">0</b><span>اتعدّل</span><span class="s" id="sk"></span></div><ul id="list"></ul>
+<div class="count"><b id="ok">0</b><span>اتعدّل</span><span class="mode" id="md"></span><span class="s" id="sk"></span></div><ul id="list"></ul>
 </div>
 </main>
 <div id="bar"><button id="copy" type="button">انسخ الكل</button></div>
 <script>
 var NL = String.fromCharCode(10);
+
+// طريقة Fragment P
 var FP = "unsafe";
 var ALPN = "http%2F1.1";
 var CS = "TLS_AES_256_GCM_SHA384%3ATLS_CHACHA20_POLY1305_SHA256%3ATLS_AES_128_GCM_SHA256%3ATLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384%3ATLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384%3ATLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256%3ATLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256%3ATLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256%3ATLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256%3ATLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA%3ATLS_ECDHE_RSA_WITH_AES_256_CBC_SHA%3ATLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256%3ATLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256";
 var FM = "%7B%22tcp%22%3A%5B%7B%22type%22%3A%22fragment%22%2C%22settings%22%3A%7B%22packets%22%3A%22tlshello%22%2C%22lengths%22%3A%5B%220%22%2C%22104%22%2C%221%22%5D%2C%22delays%22%3A%5B%220%22%5D%2C%22maxSplit%22%3A%220%22%7D%7D%2C%7B%22type%22%3A%22fragment%22%2C%22settings%22%3A%7B%22packets%22%3A%221-1%22%2C%22lengths%22%3A%5B%22114%22%2C%221%22%5D%2C%22delays%22%3A%5B%221%22%5D%2C%22maxSplit%22%3A%2211%22%7D%7D%5D%7D";
+
+// طريقة ECH
+var ECH_FP = "chrome";
+var ECH = encodeURIComponent("cloudflare-ech.com+udp://1.1.1.1");
 
 function clean(text) {
   return text
@@ -80,7 +91,12 @@ function setParam(query, key, value) {
   return out.join("&");
 }
 
-function convertLine(line) {
+function removeParam(query, key) {
+  if (query === "") return "";
+  return query.split("&").filter(function (p) { return p.split("=")[0] !== key; }).join("&");
+}
+
+function convertLine(line, mode) {
   var l = line.trim();
   if (l.indexOf("://") === -1) return null;
   var scheme = l.split("://")[0].toLowerCase();
@@ -93,19 +109,29 @@ function convertLine(line) {
   var query = q === -1 ? "" : body.slice(q + 1);
   var sec = (query.match(/(?:^|&)security=([^&]*)/) || ["", ""])[1].toLowerCase();
   if (sec !== "tls") return { out: l, status: "skip", why: sec === "reality" ? "Reality" : "بدون TLS" };
-  query = setParam(query, "fp", FP);
-  query = setParam(query, "alpn", ALPN);
-  query = setParam(query, "cs", CS);
-  query = setParam(query, "fm", FM);
+  if (mode === "ech") {
+    query = removeParam(query, "fp");
+    query = removeParam(query, "alpn");
+    query = removeParam(query, "cs");
+    query = removeParam(query, "fm");
+    query = setParam(query, "fp", ECH_FP);
+    query = setParam(query, "echConfigList", ECH);
+  } else {
+    query = removeParam(query, "echConfigList");
+    query = setParam(query, "fp", FP);
+    query = setParam(query, "alpn", ALPN);
+    query = setParam(query, "cs", CS);
+    query = setParam(query, "fm", FM);
+  }
   return { out: head + "?" + query + tag, status: "ok" };
 }
 
-function convertAll(text) {
+function convertAll(text, mode) {
   var t = clean(text).trim();
   if (t && t.indexOf("://") === -1) {
     try { t = decodeURIComponent(escape(atob(t.replace(/\s+/g, "")))); } catch (e) {}
   }
-  return t.split(NL).map(convertLine).filter(Boolean);
+  return t.split(NL).map(function (x) { return convertLine(x, mode); }).filter(Boolean);
 }
 
 function nameOf(line) {
@@ -114,18 +140,19 @@ function nameOf(line) {
   try { return decodeURIComponent(line.slice(h + 1)); } catch (e) { return line.slice(h + 1); }
 }
 
-var inp = document.getElementById("in"), go = document.getElementById("go"), res = document.getElementById("res"), bar = document.getElementById("bar"), cp = document.getElementById("copy"), output = "", total = 0;
+var inp = document.getElementById("in"), res = document.getElementById("res"), bar = document.getElementById("bar"), cp = document.getElementById("copy"), output = "", total = 0;
 
 function reset() { res.style.display = "none"; bar.style.display = "none"; }
 inp.addEventListener("input", reset);
 document.getElementById("clear").onclick = function () { inp.value = ""; reset(); };
 
-go.onclick = function () {
+function run(mode) {
   if (!inp.value.trim()) { inp.focus(); return; }
-  var r = convertAll(inp.value), ok = r.filter(function (x) { return x.status === "ok"; }).length;
+  var r = convertAll(inp.value, mode), ok = r.filter(function (x) { return x.status === "ok"; }).length;
   total = r.length;
   output = r.map(function (x) { return x.out; }).join(NL);
   document.getElementById("ok").textContent = ok;
+  document.getElementById("md").textContent = mode === "ech" ? "ECH" : "Fragment P";
   document.getElementById("sk").textContent = r.length - ok > 0 ? ("و " + (r.length - ok) + " تخطيته بدون تغيير") : "";
   var ul = document.getElementById("list"); ul.innerHTML = "";
   if (!r.length) { ul.innerHTML = '<li class="err">ما لقيت ولا كونفيق، تأكد من اللصق.</li>'; }
@@ -142,10 +169,13 @@ go.onclick = function () {
   res.style.display = "block";
   bar.style.display = r.length ? "block" : "none";
   cp.textContent = "انسخ الكل (" + total + ")";
-};
+}
+
+document.getElementById("goFrag").onclick = function () { run("frag"); };
+document.getElementById("goEch").onclick = function () { run("ech"); };
 
 cp.onclick = function () {
-  function done() { cp.textContent = "✓ انسخ، روح الصقه في v2rayNG"; setTimeout(function () { cp.textContent = "انسخ الكل (" + total + ")"; }, 1800); }
+  function done() { cp.textContent = "✓ انتسخ، روح الصقه في v2rayNG"; setTimeout(function () { cp.textContent = "انسخ الكل (" + total + ")"; }, 1800); }
   function fb() { var t = document.createElement("textarea"); t.value = output; document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove(); done(); }
   if (navigator.clipboard) { navigator.clipboard.writeText(output).then(done, fb); } else fb();
 };
