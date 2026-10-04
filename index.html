@@ -110,13 +110,14 @@ function convertLine(line, mode) {
   var sec = (query.match(/(?:^|&)security=([^&]*)/) || ["", ""])[1].toLowerCase();
   if (sec !== "tls") return { out: l, status: "skip", why: sec === "reality" ? "Reality" : "بدون TLS" };
   if (mode === "ech") {
-    query = removeParam(query, "fp");
-    query = removeParam(query, "alpn");
     query = removeParam(query, "cs");
     query = removeParam(query, "fm");
-    query = setParam(query, "fp", ECH_FP);
     query = removeParam(query, "echConfigList");
+    query = setParam(query, "fp", ECH_FP);
+    query = setParam(query, "alpn", ALPN);
     query = setParam(query, "ech", ECH);
+    query = setParam(query, "insecure", "0");
+    query = setParam(query, "allowInsecure", "0");
   } else {
     query = removeParam(query, "ech");
     query = removeParam(query, "echConfigList");
